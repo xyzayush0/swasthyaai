@@ -1,42 +1,28 @@
 import streamlit as st
-import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.datasets import load_breast_cancer
 
 st.title("🫀 SwasthyaAI - AI Health Risk Predictor")
 
-# Load dataset
-dataset = load_breast_cancer()
-data = pd.DataFrame(dataset.data, columns=dataset.feature_names)
-data["target"] = dataset.target
+st.write("AI-based preventive health screening tool")
 
-# Use first 3 features
-X = data.iloc[:, :3]
-y = data["target"]
+st.header("Enter Health Details")
 
-# Train-test split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+age = st.number_input("Age", 1, 100, 30)
+bp = st.number_input("Blood Pressure", 80, 200, 120)
+chol = st.number_input("Cholesterol Level", 100, 400, 200)
 
-model = RandomForestClassifier()
-model.fit(X_train, y_train)
+# Simple ML-like risk formula
+risk_score = (age * 0.3) + (bp * 0.2) + (chol * 0.1)
 
-accuracy = model.score(X_test, y_test)
-
-st.write(f"Model Accuracy: {round(accuracy*100,2)}%")
-
-st.header("Enter Health Parameters")
-
-f1 = st.number_input("Feature 1", value=10.0)
-f2 = st.number_input("Feature 2", value=10.0)
-f3 = st.number_input("Feature 3", value=10.0)
+st.subheader("Risk Score")
+st.progress(int(min(risk_score, 100)))
 
 if st.button("Predict Risk"):
-    input_data = np.array([[f1, f2, f3]])
-    prediction = model.predict(input_data)
-
-    if prediction[0] == 1:
-        st.success("Low Risk")
+    if risk_score > 80:
+        st.error("High Risk ⚠️")
+    elif risk_score > 50:
+        st.warning("Moderate Risk")
     else:
-        st.error("High Risk")
+        st.success("Low Risk ✅")
+
+    st.write(f"Calculated Risk Score: {round(risk_score,2)}")
